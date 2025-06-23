@@ -29,12 +29,25 @@ module "blog_vpc" {
   }
 }
 
+resource "aws_instance" "blog" {
+  ami = data.aws_ami.app_ami.id
+  instance_type = var.instance_type
 
-module "blog_alb" {
+  subnet_id = module.blog_vpc.public_subnets[0]
+  vpc_security_group_ids = [module.blog_sg.security_group_id]
+
+  tags = {
+    Name = "HelloWorld"
+  }
+
+}
+ 
+
+module "alb" {
   source  = "terraform-aws-modules/alb/aws"
   version = "~> 6.0"
 
-  name = "alb"
+  name = "blog-alb"
 
   load_balancer_type = "application"
 
